@@ -12,7 +12,7 @@ const server = http.createServer(app);
 // Configure Socket.io with CORS
 const io = new Server(server, {
     cors: {
-        origin: "*", // well that didnt work so back again
+        origin: "https://whiteboard-server-7uvq.onrender.com", // well that didnt work so back again
         methods: ["GET", "POST"]
     }
 });
@@ -22,7 +22,11 @@ io.on('connection', (socket) => {
     socket.on('draw', (data) => {
         socket.broadcast.emit('draw', data);
     });
+    //new feature add text onn double click :
+    socket.on('text',(data) =>{
+        socket.broadcast.emit('text',data); //this sends text to everyone else
 
+    });
     // Listen for clear board events
     socket.on('clear', () => {
         io.emit('clear'); // Tell EVERYONE to clear their screen
