@@ -12,7 +12,7 @@ const server = http.createServer(app);
 // Configure Socket.io with CORS
 const io = new Server(server, {
     cors: {
-        origin: "https://sourav-whiteboard.vercel.app/", //  replaced "*" with actual  Vercel URL
+        origin: "*", // well that didnt work so back again
         methods: ["GET", "POST"]
     }
 });
