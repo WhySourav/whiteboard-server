@@ -12,7 +12,7 @@ const server = http.createServer(app);
 // Configure Socket.io with CORS
 const io = new Server(server, {
     cors: {
-        origin: "https://whiteboard-server-7uvq.onrender.com", // well that didnt work so back again
+        origin: "https://sourav-whiteboard.vercel.app", // well that didnt work so back again
         methods: ["GET", "POST"]
     }
 });
