@@ -8,32 +8,32 @@ app.use(cors());
 
 const server = http.createServer(app);
 
+// SETUP SOCKET.IO
 const io = new Server(server, {
     cors: {
-        origin: "https://sourav-whiteboard.vercel.app", 
+        origin: "*", // Allow all connections (Vercel, Localhost, etc.)
         methods: ["GET", "POST"]
     }
 });
 
 io.on('connection', (socket) => {
-    // 1. Join Room Event
+    // 1. Join a specific room
     socket.on('join_room', (room) => {
         socket.join(room);
         console.log(`User ${socket.id} joined room: ${room}`);
     });
 
-    // 2. Drawing Event (Scoped to Room)
+    // 2. Handle Drawing (Broadcast only to that room)
     socket.on('draw', (data) => {
-        // data now includes { room: '...', x0: ... }
         socket.to(data.room).emit('draw', data);
     });
 
-    // 3. Text Event (Scoped to Room)
+    // 3. Handle Text (Broadcast only to that room)
     socket.on('text', (data) => {
         socket.to(data.room).emit('text', data);
     });
 
-    // 4. Clear Event (Scoped to Room)
+    // 4. Handle Clear (Broadcast only to that room)
     socket.on('clear', (room) => {
         socket.to(room).emit('clear');
     });
