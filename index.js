@@ -1,35 +1,41 @@
-// server/index.js
 const express = require('express');
 const http = require('http');
 const { Server } = require("socket.io");
 const cors = require('cors');
 
 const app = express();
-app.use(cors()); // Allow requests from any origin (required for Vercel/Render split)
+app.use(cors());
 
 const server = http.createServer(app);
 
-// Configure Socket.io with CORS
 const io = new Server(server, {
     cors: {
-        origin: "https://sourav-whiteboard.vercel.app", // well that didnt work so back again
+        origin: "https://sourav-whiteboard.vercel.app", 
         methods: ["GET", "POST"]
     }
 });
 
 io.on('connection', (socket) => {
-    // Listen for drawing events
-    socket.on('draw', (data) => {
-        socket.broadcast.emit('draw', data);
+    // 1. Join Room Event
+    socket.on('join_room', (room) => {
+        socket.join(room);
+        console.log(`User ${socket.id} joined room: ${room}`);
     });
-    //new feature add text onn double click :
-    socket.on('text',(data) =>{
-        socket.broadcast.emit('text',data); //this sends text to everyone else
 
+    // 2. Drawing Event (Scoped to Room)
+    socket.on('draw', (data) => {
+        // data now includes { room: '...', x0: ... }
+        socket.to(data.room).emit('draw', data);
     });
-    // Listen for clear board events
-    socket.on('clear', () => {
-        io.emit('clear'); // Tell EVERYONE to clear their screen
+
+    // 3. Text Event (Scoped to Room)
+    socket.on('text', (data) => {
+        socket.to(data.room).emit('text', data);
+    });
+
+    // 4. Clear Event (Scoped to Room)
+    socket.on('clear', (room) => {
+        socket.to(room).emit('clear');
     });
 });
 
